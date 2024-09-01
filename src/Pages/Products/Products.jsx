@@ -7,7 +7,12 @@ import { payloads, formsJSON, tableColumns } from "../../constants/index";
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
 import { hasData } from "../../util/util";
 import DataTable from "../../Components/DataTable/DataTable";
-import { createProduct, getAllCategories, getAllProducts } from "../../thunk";
+import {
+  createProduct,
+  deleteProduct,
+  getAllCategories,
+  getAllProducts,
+} from "../../thunk";
 import { selectCategory } from "../../Store/categorySlice";
 import Checkbox from "@mui/material/Checkbox";
 import { selectProducts } from "../../Store/productSlice";
@@ -36,7 +41,8 @@ export const Products = () => {
 
   //redux data
   const { data: categoryData, isError } = useSelector(selectCategory);
-  const { data :  productData , isError: productError} = useSelector(selectProducts)
+  const { data: productData, isError: productError } =
+    useSelector(selectProducts);
 
   /*
   ########################################################################
@@ -94,36 +100,37 @@ export const Products = () => {
     setPageData(productPayload);
     setStatus("CREATE");
     setCheckedCategory([]);
-    setProductImages([])
+    setProductImages([]);
   };
   const handleDelete = (id) => {
-    const payload = {
-      productId: id,
-      isDelete: true,
-    };
+    dispatch(deleteProduct({ productId: id }));
   };
 
   const formData = new FormData();
-  const handleSubmit = () => {
-    if (status === 'CREATE') {
 
+  const handleSubmit = async () => {
+    if (status === "CREATE") {
       Object.keys(pageData).map((key) => {
         formData.append(key, pageData[key]);
       });
 
-      checkedCategory.map((category) => formData.append("categoryId", category))
+      checkedCategory.map((category) =>
+        formData.append("categoryId", category)
+      );
       productImages.map((eachImage) => {
-
         formData.append("productImages", eachImage);
-      })
+      });
 
-      dispatch(createProduct(formData));
-    } else if (status === 'EDIT') {
-      console.log(pageData)
-      console.log(checkedCategory)
-      console.log(productImages)
+      const { status } = await dispatch(createProduct(formData)).unwrap();
+      if (status == 200) {
+        setForm(false);
+        setPageData(productPayload);
+      }
+    } else if (status === "EDIT") {
+      console.log(pageData);
+      console.log(checkedCategory);
+      console.log(productImages);
     }
-
   };
 
   /*
@@ -134,7 +141,7 @@ export const Products = () => {
 
   useEffect(() => {
     dispatch(getAllCategories());
-    dispatch(getAllProducts())
+    dispatch(getAllProducts());
   }, []);
 
   /*

@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-    createProduct,
-    getAllProducts,
-    updateProduct,
-    deleteProduct
+  createProduct,
+  getAllProducts,
+  updateProduct,
+  deleteProduct,
 } from "../thunk/index";
 
 const initialState = {
