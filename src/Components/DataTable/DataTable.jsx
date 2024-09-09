@@ -1,9 +1,12 @@
-
 import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
 import { Button } from "@mui/material";
 import EditSharpIcon from "@mui/icons-material/EditSharp";
 import DeleteForeverSharpIcon from "@mui/icons-material/DeleteForeverSharp";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import { VisuallyHiddenInput } from "../FormComponent/DynamicForm";
+
+import IconButton from "@mui/material/IconButton";
 
 const DataTable = ({
   rows,
@@ -11,6 +14,7 @@ const DataTable = ({
   handleEdit,
   handleDelete,
   handleActive,
+  handleImageUpload,
   paginationModel,
   setPaginationModel,
   totalCount,
@@ -22,15 +26,24 @@ const DataTable = ({
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Button
+        {handleImageUpload ? (
+          <IconButton
+            onClick={() => handleImageUpload(params.row)}
+            style={{ marginRight: 10 }}
+          >
+            <AddPhotoAlternateIcon sx={{ color: "gray" }} />
+          </IconButton>
+        ) : null}
+
+        <IconButton
           onClick={() => handleEdit(params.row)}
           style={{ marginRight: 10 }}
         >
           <EditSharpIcon sx={{ color: "gray" }} />
-        </Button>
-        <Button size='small' onClick={() => handleDelete(params.row._id)}>
+        </IconButton>
+        <IconButton size="small" onClick={() => handleDelete(params.row._id)}>
           <DeleteForeverSharpIcon sx={{ color: "red" }} />
-        </Button>
+        </IconButton>
       </div>
     ),
   };
@@ -41,26 +54,21 @@ const DataTable = ({
     sortable: false,
     renderCell: (params) => (
       <div>
-        <Button variant="outlined" 
-          onClick={() => handleActive(params.row)}
-
-        >
-          {params.row.isActive ===false ? "Activate" :"Deactivate"}
-
+        <Button variant="outlined" onClick={() => handleActive(params.row)}>
+          {params.row.isActive === false ? "Activate" : "Deactivate"}
         </Button>
-
       </div>
     ),
   };
 
   return (
-    <div className='flex justify-center items-center min-h-screen w-full'>
-      <div className='w-full relative'>
+    <div className="flex justify-center items-center min-h-screen w-full">
+      <div className="w-full relative">
         <DataGrid
           rows={rows}
-          columns={[...columns,activeColumn, actionColumn]}
+          columns={[...columns, activeColumn, actionColumn]}
           getRowId={(row) => row._id}
-          className=''
+          className=""
           pagination
           rowCount={totalCount}
           pageSizeOptions={[10, 50, 100]}

@@ -1,8 +1,10 @@
 import { useTools } from "../../Hooks/useTools";
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { FormComponent } from "../../Components/FormComponent/FormComponent";
+import FormComponent from "../../Components/FormComponent/FormComponent";
 import { payloads, formsJSON, tableColumns } from "../../constants/index";
+import ImageList from "@mui/material/ImageList";
+import ImageListItem from "@mui/material/ImageListItem";
 
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
 import { hasData } from "../../util/util";
@@ -12,12 +14,14 @@ import {
   deleteProduct,
   getAllCategories,
   getAllProducts,
+  updateProductImage,
 } from "../../thunk";
 import { selectCategory } from "../../Store/categorySlice";
 import Checkbox from "@mui/material/Checkbox";
 import { selectProducts } from "../../Store/productSlice";
+import { CustomModal } from "../../Components/CustomModal";
 
-const { productForm } = formsJSON;
+const { productForm1, productForm2 } = formsJSON;
 const { productPayload } = payloads;
 const { productColumns } = tableColumns;
 export const Products = () => {
@@ -26,12 +30,17 @@ export const Products = () => {
           STATES
   ########################################################################
  */
+  const options = {
+    apiKey: "free", // Get API key: https://www.bytescale.com/get-started
+    maxFileCount: 1,
+  };
   const { dispatch, useSelector } = useTools();
   const [paginationMode, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
   });
   const [isForm, setForm] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const [status, setStatus] = useState("CREATE");
   const [pageData, setPageData] = useState({ ...productPayload });
 
@@ -102,19 +111,24 @@ export const Products = () => {
     setCheckedCategory([]);
     setProductImages([]);
   };
+
+  const handleClose = () => {
+    setOpenModal(false);
+    handleCancel();
+  };
+
   const handleDelete = (id) => {
     dispatch(deleteProduct({ productId: id }));
   };
 
-  const formData = new FormData();
-
   const handleSubmit = async () => {
+    const formData = new FormData();
     if (status === "CREATE") {
       Object.keys(pageData).map((key) => {
         formData.append(key, pageData[key]);
       });
 
-      checkedCategory.map((category) =>
+      checkedCategory.forEach((category) =>
         formData.append("categoryId", category)
       );
       productImages.map((eachImage) => {
@@ -127,10 +141,48 @@ export const Products = () => {
         setPageData(productPayload);
       }
     } else if (status === "EDIT") {
-      console.log(pageData);
-      console.log(checkedCategory);
-      console.log(productImages);
+      Object.keys(pageData).map((key) => {
+        formData.append(key, pageData[key]);
+      });
+      formData.delete("categoryId");
+
+      if (checkedCategory.length > 0) {
+        formData.append("categoryId", checkedCategory);
+      }
+      formData.delete("productImages");
+
+      const { status } = await dispatch(updateProductImage(formData)).unwrap();
+      if (status == 200) {
+        setForm(false);
+        setPageData(productPayload);
+      }
+    } else if (status === "UPLOAD_IMAGE") {
+      formData.delete("categoryId");
+      Object.keys(pageData).map((key) => {
+        formData.delete(key);
+      });
+      productImages.map((eachImage) => {
+        formData.append("productImages", eachImage);
+      });
+
+      const { status } = await dispatch(updateProductImage(formData)).unwrap();
+      if (status == 200) {
+        setForm(false);
+        setPageData(productPayload);
+      }
+      setOpenModal(false);
     }
+  };
+
+  const handleImageUpload = (row) => {
+    const data = { ...row };
+    data.productId = data._id;
+    const ids = data.categoryId.map((item) => item._id);
+    setCheckedCategory(ids);
+
+    setPageData(data);
+    setOpenModal(true);
+    setStatus("UPLOAD_IMAGE");
   };
 
   /*
@@ -171,7 +223,7 @@ export const Products = () => {
         <>
           <Wrapper>
             <Box mb={4}>
-              <Button variant='contained' onClick={() => setForm(true)}>
+              <Button variant="contained" onClick={() => setForm(true)}>
                 Add New Product +
               </Button>
             </Box>
@@ -181,6 +233,8 @@ export const Products = () => {
                 handleActive={handleActive}
                 handleEdit={handleEdit}
                 handleDelete={handleDelete}
+                handleImageUpload={handleImageUpload}
+                handleChange={handleChange}
                 columns={productColumns}
                 totalCount={0}
                 paginationModel={paginationMode}
@@ -195,35 +249,132 @@ export const Products = () => {
         </>
       ) : (
         <Wrapper>
-          <FormComponent
-            formDefinition={productForm}
-            formPayload={pageData}
-            status={status}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            onCancel={handleCancel}
-          >
-            <Box display={"flex"} gap={1} flexWrap={"wrap"}>
+          <Box sx={{ mx: { md: 25, xs: 2 } }}>
+            <FormComponent
+              formDefinition={productForm1}
+              grid={true}
+              gridTemplateColumns={{
+                md: "repeat(3,1fr)",
+                xs: "repeat(2,1fr)",
+              }}
+              formPayload={pageData}
+              status={status}
+              handleChange={handleChange}
+              handleSubmit={handleSubmit}
+              onCancel={handleCancel}
+            />
+
+            <FormComponent
+              formDefinition={productForm2}
+              grid={true}
+              gridTemplateColumns="2fr"
+              formPayload={pageData}
+              status={status}
+              handleChange={handleChange}
+              handleSubmit={handleSubmit}
+              onCancel={handleCancel}
+            >
+              <Box display={"flex"} gap={1} flexWrap={"wrap"}>
+                {productImages &&
+                  productImages.map((selectedImage, i) => {
+                    return (
+                      <img
+                        src={URL.createObjectURL(selectedImage)}
+                        height={"80px"}
+                        width={"80px"}
+                        alt=""
+                        key={i}
+                      />
+                    );
+                  })}
+              </Box>
+              <Typography>Select Categories</Typography>
+              <Box display={"flex"} gap={2} flexWrap={"wrap"}>
+                {categoryIds}
+              </Box>
+
+              <Box
+                mt={3}
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <Button
+                  onClick={handleSubmit}
+                  variant="outlined"
+                  color="success"
+                >
+                  {status === "CREATE" ? "Create" : "Update"}
+                </Button>
+                <Button variant="outlined" color="error" onClick={handleCancel}>
+                  Cancel
+                </Button>
+              </Box>
+            </FormComponent>
+          </Box>
+        </Wrapper>
+      )}
+      <CustomModal open={openModal} handleClose={handleClose}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {productImages && productImages.length === 0 ? (
+            <FormComponent
+              formDefinition={[productForm2[2]]}
+              grid={true}
+              gridTemplateColumns="2fr"
+              formPayload={pageData}
+              status={status}
+              handleChange={handleChange}
+              handleSubmit={handleSubmit}
+              onCancel={handleCancel}
+            />
+          ) : null}
+
+          {productImages && productImages.length > 0 ? (
+            <ImageList
+              sx={{
+                width: { md: 600, sx: 400, xs: 300 },
+                height: 450,
+                display: "grid",
+                gap: 5,
+                gridTemplateColumns: "repeat(3,1fr)",
+              }}
+              cols={3}
+              rowHeight={164}
+            >
               {productImages &&
                 productImages.map((selectedImage, i) => {
                   return (
-                    <img
-                      src={URL.createObjectURL(selectedImage)}
-                      height={"80px"}
-                      width={"80px"}
-                      alt=''
-                      key={i}
-                    />
+                    <ImageListItem key={i}>
+                      <img
+                        src={URL.createObjectURL(selectedImage)}
+                        height={"80px"}
+                        width={"80px"}
+                        alt=""
+                        key={i}
+                      />
+                    </ImageListItem>
                   );
                 })}
-            </Box>
-            <Typography>Select Categories</Typography>
-            <Box display={"flex"} gap={2} flexWrap={"wrap"}>
-              {categoryIds}
-            </Box>
-          </FormComponent>
-        </Wrapper>
-      )}
+            </ImageList>
+          ) : null}
+        </Box>
+
+        {productImages && productImages.length > 0 ? (
+          <Box mt={3} sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button onClick={handleSubmit} variant="outlined" color="success">
+              Upload
+            </Button>
+            <Button variant="outlined" color="error" onClick={handleCancel}>
+              Cancel
+            </Button>
+          </Box>
+        ) : null}
+      </CustomModal>
     </>
   );
 };

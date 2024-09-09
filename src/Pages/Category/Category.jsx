@@ -3,9 +3,14 @@
 import { useTools } from "../../Hooks/useTools";
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { FormComponent } from "../../Components/FormComponent/FormComponent";
+import FormComponent from "../../Components/FormComponent/FormComponent";
 import { payloads, formsJSON } from "../../constants/index";
-import { createCategory, deleteCategory, getAllCategories, updateCategory } from "../../thunk";
+import {
+  createCategory,
+  deleteCategory,
+  getAllCategories,
+  updateCategory,
+} from "../../thunk";
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
 import { selectCategory } from "../../Store/categorySlice";
 import { hasData } from "../../util/util";
@@ -68,19 +73,18 @@ export const Category = () => {
     setForm(true);
   };
 
-  const handleSubmit =  async () => {
+  const handleSubmit = async () => {
     const formData = new FormData();
-    console.log(status)
+    console.log(status);
     if (status === "CREATE") {
       formData.append("categoryTitle", pageData.categoryTitle);
       formData.append("categoryImage", pageData.categoryImage);
 
-      const {status} = await dispatch(createCategory(formData)).unwrap()
+      const { status } = await dispatch(createCategory(formData)).unwrap();
       if (status == 200) {
-        setForm(false)
-        setPageData(categoryPayload)
+        setForm(false);
+        setPageData(categoryPayload);
       }
-
     } else if (status === "EDIT") {
       if (pageData.categoryImage) {
         formData.append("categoryImage", pageData.categoryImage);
@@ -89,8 +93,8 @@ export const Category = () => {
       formData.append("categoryId", pageData.categoryId);
       const { status } = await dispatch(updateCategory(formData)).unwrap();
       if (status == 200) {
-        setForm(false)
-        setPageData(categoryPayload)
+        setForm(false);
+        setPageData(categoryPayload);
       }
     }
   };
@@ -125,7 +129,7 @@ export const Category = () => {
         <>
           <Wrapper>
             <Box mb={4}>
-              <Button variant='contained' onClick={() => setForm(true)}>
+              <Button variant="contained" onClick={() => setForm(true)}>
                 Add New Category +
               </Button>
             </Box>
