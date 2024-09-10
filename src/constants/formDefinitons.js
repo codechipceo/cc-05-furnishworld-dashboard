@@ -11,24 +11,29 @@ const categoryForm = [
   },
 ];
 
-const productForm = [
+const productForm1 = [
   {
     name: "productTitle",
     label: "Product Title",
     type: "text",
     required: true,
   },
-  {
-    name: "productDescription",
-    label: "Product Description",
-    type: "text",
-  },
+
   {
     name: "price",
     label: "Price",
     type: "text",
     required: true,
   },
+
+  {
+    name: "salePrice",
+    label: "Sales Price",
+    type: "text",
+  },
+];
+
+const productForm2 = [
   {
     name: "quantity",
     label: "Quantity",
@@ -37,21 +42,22 @@ const productForm = [
     defaultValue: 0,
   },
   {
-    name: "salePrice",
-    label: "Sales Price",
+    name: "productDescription",
+    label: "Product Description",
     type: "text",
+    rows: 6,
   },
   {
     name: "file",
-    label: "Sales Price",
+    label: "Upload Image",
     type: "file",
     mimeType: "image/*",
     multiple: true,
   },
 ];
 
-
 export const formsJSON = {
-    categoryForm, productForm
-
-}
+  categoryForm,
+  productForm1,
+  productForm2,
+};

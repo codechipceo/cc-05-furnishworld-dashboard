@@ -13,10 +13,10 @@ const products = {
   getById: "product/getById",
   update: "product/update",
   delete: "product/delete",
+  upload: "product/upload",
 };
 
 export const apiEndpoints = {
   category,
   products,
 };
-

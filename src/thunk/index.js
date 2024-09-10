@@ -11,7 +11,7 @@ const { category, products } = apiEndpoints;
 export const createCategory = thunkWrapper(
   "category/create",
   async (payload) => {
-    console.log("Inside redux")
+    console.log("Inside redux");
     return await createRequest(category.create, payload);
   }
 );
@@ -76,6 +76,13 @@ export const getProductById = thunkWrapper(
 export const updateProduct = thunkWrapper("product/update", async (payload) => {
   return await createRequest(products.update, payload);
 });
+
+export const updateProductImage = thunkWrapper(
+  "product/upload",
+  async (payload) => {
+    return await createRequest(products.upload, payload);
+  }
+);
 
 export const deleteProduct = thunkWrapper("product/delete", async (payload) => {
   return await createRequest(products.delete, payload);
