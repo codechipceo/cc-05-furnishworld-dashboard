@@ -1,11 +1,12 @@
 import { useTools } from "../../Hooks/useTools";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FormComponent from "../../Components/FormComponent/FormComponent";
 import { payloads, formsJSON, tableColumns } from "../../constants/index";
 import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
-
+import { ImageListItem } from "@mui/material";
+import ImageListItemBar from "@mui/material/ImageListItemBar";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
 import { hasData } from "../../util/util";
 import DataTable from "../../Components/DataTable/DataTable";
@@ -77,7 +78,13 @@ export const Products = () => {
 
     const data = { ...pageData };
     if (e.target.files) {
-      const files = Array.from(e.target.files);
+      const files = Array.from(e.target.files).map((file) =>
+        URL.createObjectURL(file)
+      );
+      if (productImages.length > 0) {
+        files.unshift(...productImages);
+      }
+
       setProductImages(files);
     } else {
       data[name] = value;
@@ -100,6 +107,8 @@ export const Products = () => {
     setCheckedCategory(ids);
 
     setPageData(data);
+    const files = data.productImages.map((item) => item.imageUrl);
+    setProductImages(files);
     setStatus("EDIT");
     setForm(true);
   };
@@ -113,8 +122,8 @@ export const Products = () => {
   };
 
   const handleClose = () => {
-    setOpenModal(false);
     handleCancel();
+    setOpenModal(false);
   };
 
   const handleDelete = (id) => {
@@ -176,13 +185,19 @@ export const Products = () => {
 
   const handleImageUpload = (row) => {
     const data = { ...row };
-    data.productId = data._id;
-    const ids = data.categoryId.map((item) => item._id);
-    setCheckedCategory(ids);
-
+    data.productId = row._id;
     setPageData(data);
+
+    const files = data.productImages.map((item) => item.imageUrl);
+    setProductImages(files);
     setOpenModal(true);
     setStatus("UPLOAD_IMAGE");
+  };
+
+  const handleImageDelete = (img) => {
+    const proImag = productImages.filter((item) => item !== img);
+
+    setProductImages(proImag);
   };
 
   /*
@@ -279,7 +294,7 @@ export const Products = () => {
                   productImages.map((selectedImage, i) => {
                     return (
                       <img
-                        src={URL.createObjectURL(selectedImage)}
+                        src={selectedImage}
                         height={"80px"}
                         width={"80px"}
                         alt=""
@@ -321,24 +336,21 @@ export const Products = () => {
             alignItems: "center",
           }}
         >
-          {productImages && productImages.length === 0 ? (
-            <FormComponent
-              formDefinition={[productForm2[2]]}
-              grid={true}
-              gridTemplateColumns="2fr"
-              formPayload={pageData}
-              status={status}
-              handleChange={handleChange}
-              handleSubmit={handleSubmit}
-              onCancel={handleCancel}
-            />
-          ) : null}
-
+          <FormComponent
+            formDefinition={[productForm2[2]]}
+            grid={true}
+            gridTemplateColumns="2fr"
+            formPayload={pageData}
+            status={status}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            onCancel={handleCancel}
+          />
           {productImages && productImages.length > 0 ? (
             <ImageList
               sx={{
                 width: { md: 600, sx: 400, xs: 300 },
-                height: 450,
+
                 display: "grid",
                 gap: 5,
                 gridTemplateColumns: "repeat(3,1fr)",
@@ -351,11 +363,22 @@ export const Products = () => {
                   return (
                     <ImageListItem key={i}>
                       <img
-                        src={URL.createObjectURL(selectedImage)}
+                        src={selectedImage}
                         height={"80px"}
                         width={"80px"}
                         alt=""
                         key={i}
+                      />
+                      <ImageListItemBar
+                        sx={{ display: "flex", justifyContent: "center" }}
+                        actionIcon={
+                          <IconButton
+                            sx={{ color: "red" }}
+                            onClick={() => handleImageDelete(selectedImage)}
+                          >
+                            <DeleteForeverIcon />
+                          </IconButton>
+                        }
                       />
                     </ImageListItem>
                   );
@@ -369,7 +392,7 @@ export const Products = () => {
             <Button onClick={handleSubmit} variant="outlined" color="success">
               Upload
             </Button>
-            <Button variant="outlined" color="error" onClick={handleCancel}>
+            <Button variant="outlined" color="error" onClick={handleClose}>
               Cancel
             </Button>
           </Box>
