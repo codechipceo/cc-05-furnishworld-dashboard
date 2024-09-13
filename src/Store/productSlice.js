@@ -25,7 +25,7 @@ const productSlice = createSlice({
       })
       .addCase(updateProduct.fulfilled, (state, { payload }) => {
         state.data = state.data.map((item) => {
-          if (item._id === payload.data._id) return payload.data[0];
+          if (item._id === payload.data._id) return payload.data;
           return item;
         });
       })

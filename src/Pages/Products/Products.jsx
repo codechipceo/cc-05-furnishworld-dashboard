@@ -15,6 +15,7 @@ import {
   deleteProduct,
   getAllCategories,
   getAllProducts,
+  updateProduct,
   updateProductImage,
 } from "../../thunk";
 import { selectCategory } from "../../Store/categorySlice";
@@ -160,7 +161,7 @@ export const Products = () => {
       }
       formData.delete("productImages");
 
-      const { status } = await dispatch(updateProductImage(formData)).unwrap();
+      const { status } = await dispatch(updateProduct(formData)).unwrap();
       if (status == 200) {
         setForm(false);
         setPageData(productPayload);
