@@ -5,6 +5,7 @@ import {
   updateProduct,
   deleteProduct,
   updateProductImage,
+  deleteProductImage,
 } from "../thunk/index";
 
 const initialState = {
@@ -30,6 +31,12 @@ const productSlice = createSlice({
         });
       })
       .addCase(updateProductImage.fulfilled, (state, { payload }) => {
+        state.data = state.data.map((item) => {
+          if (item._id === payload.data._id) return payload.data;
+          return item;
+        });
+      })
+      .addCase(deleteProductImage.fulfilled, (state, { payload }) => {
         state.data = state.data.map((item) => {
           if (item._id === payload.data._id) return payload.data;
           return item;

@@ -13,7 +13,7 @@ const products = {
   getById: "product/getById",
   update: "product/update",
   delete: "product/delete",
-  upload: "product/upload",
+  upload: "product/",
 };
 
 export const apiEndpoints = {

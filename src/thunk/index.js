@@ -78,9 +78,24 @@ export const updateProduct = thunkWrapper("product/update", async (payload) => {
 });
 
 export const updateProductImage = thunkWrapper(
-  "product/upload",
+  "product/uploadImage",
   async (payload) => {
-    return await createRequest(products.upload, payload);
+    return await createRequest(
+      products.upload + payload.get("productId") + "/images",
+      payload,
+      "put"
+    );
+  }
+);
+
+export const deleteProductImage = thunkWrapper(
+  "product/deleteImage",
+  async (payload) => {
+    return await createRequest(
+      products.upload + payload.productId + "/images/" + payload.imageId,
+      payload,
+      "delete"
+    );
   }
 );
 

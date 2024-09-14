@@ -3,13 +3,11 @@ import { Box, Button, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FormComponent from "../../Components/FormComponent/FormComponent";
 import { payloads, formsJSON, tableColumns } from "../../constants/index";
-import ImageList from "@mui/material/ImageList";
-import { ImageListItem } from "@mui/material";
-import ImageListItemBar from "@mui/material/ImageListItemBar";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
 import { hasData } from "../../util/util";
 import DataTable from "../../Components/DataTable/DataTable";
+
 import {
   createProduct,
   deleteProduct,
@@ -17,11 +15,12 @@ import {
   getAllProducts,
   updateProduct,
   updateProductImage,
+  deleteProductImage,
 } from "../../thunk";
 import { selectCategory } from "../../Store/categorySlice";
 import Checkbox from "@mui/material/Checkbox";
 import { selectProducts } from "../../Store/productSlice";
-import { CustomModal } from "../../Components/CustomModal";
+import ImageViewer from "./ImageUpload/ImageViewer";
 
 const { productForm1, productForm2 } = formsJSON;
 const { productPayload } = payloads;
@@ -49,6 +48,7 @@ export const Products = () => {
   const [checkedCategory, setCheckedCategory] = useState([]);
 
   const [productImages, setProductImages] = useState([]);
+  const [disable, setDisable] = useState(true);
 
   //redux data
   const { data: categoryData, isError } = useSelector(selectCategory);
@@ -74,18 +74,25 @@ export const Products = () => {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e, imageId = null) => {
     const { name, value } = e.target;
-
+    setDisable(false);
     const data = { ...pageData };
     if (e.target.files) {
-      const files = Array.from(e.target.files).map((file) =>
-        URL.createObjectURL(file)
+      const imag = productImages.find(
+        (image) => image?._id === imageId || imageId === image
       );
+      const files = Array.from(e.target.files).map((file) => {
+        if (imag && imag._id) {
+          file._id = imag._id;
+        }
+        return file;
+      });
       if (productImages.length > 0) {
-        files.unshift(...productImages);
+        const updatedImg = productImages.filter((img) => imag !== img);
+        files.push(...updatedImg);
       }
-
+      console.log(files);
       setProductImages(files);
     } else {
       data[name] = value;
@@ -168,18 +175,27 @@ export const Products = () => {
       }
     } else if (status === "UPLOAD_IMAGE") {
       formData.delete("categoryId");
+
       Object.keys(pageData).map((key) => {
         formData.delete(key);
       });
-      productImages.map((eachImage) => {
-        formData.append("productImages", eachImage);
+
+      formData.append("productId", pageData._id);
+
+      productImages.forEach(async (eachImage) => {
+        formData.append("image", eachImage);
+        if (eachImage._id) formData.append("imageId", eachImage._id);
+        if (eachImage.name) {
+          const { status } = await dispatch(
+            updateProductImage(formData)
+          ).unwrap();
+          if (status == 200) {
+            setForm(false);
+            setPageData(productPayload);
+          }
+        }
       });
 
-      const { status } = await dispatch(updateProductImage(formData)).unwrap();
-      if (status == 200) {
-        setForm(false);
-        setPageData(productPayload);
-      }
       setOpenModal(false);
     }
   };
@@ -189,15 +205,16 @@ export const Products = () => {
     data.productId = row._id;
     setPageData(data);
 
-    const files = data.productImages.map((item) => item.imageUrl);
-    setProductImages(files);
+    setProductImages(data.productImages);
     setOpenModal(true);
     setStatus("UPLOAD_IMAGE");
   };
 
-  const handleImageDelete = (img) => {
+  const handleImageDelete = async (productId, img) => {
+    await dispatch(deleteProductImage({ productId, imageId: img._id }));
     const proImag = productImages.filter((item) => item !== img);
 
+    setDisable(true);
     setProductImages(proImag);
   };
 
@@ -328,77 +345,19 @@ export const Products = () => {
           </Box>
         </Wrapper>
       )}
-      <CustomModal open={openModal} handleClose={handleClose}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <FormComponent
-            formDefinition={[productForm2[2]]}
-            grid={true}
-            gridTemplateColumns="2fr"
-            formPayload={pageData}
-            status={status}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            onCancel={handleCancel}
-          />
-          {productImages && productImages.length > 0 ? (
-            <ImageList
-              sx={{
-                width: { md: 600, sx: 400, xs: 300 },
 
-                display: "grid",
-                gap: 5,
-                gridTemplateColumns: "repeat(3,1fr)",
-              }}
-              cols={3}
-              rowHeight={164}
-            >
-              {productImages &&
-                productImages.map((selectedImage, i) => {
-                  return (
-                    <ImageListItem key={i}>
-                      <img
-                        src={selectedImage}
-                        height={"80px"}
-                        width={"80px"}
-                        alt=""
-                        key={i}
-                      />
-                      <ImageListItemBar
-                        sx={{ display: "flex", justifyContent: "center" }}
-                        actionIcon={
-                          <IconButton
-                            sx={{ color: "red" }}
-                            onClick={() => handleImageDelete(selectedImage)}
-                          >
-                            <DeleteForeverIcon />
-                          </IconButton>
-                        }
-                      />
-                    </ImageListItem>
-                  );
-                })}
-            </ImageList>
-          ) : null}
-        </Box>
-
-        {productImages && productImages.length > 0 ? (
-          <Box mt={3} sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button onClick={handleSubmit} variant="outlined" color="success">
-              Upload
-            </Button>
-            <Button variant="outlined" color="error" onClick={handleClose}>
-              Cancel
-            </Button>
-          </Box>
-        ) : null}
-      </CustomModal>
+      <ImageViewer
+        openModal={openModal}
+        handleClose={handleClose}
+        productForm2={productForm2}
+        pageData={pageData}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        status={status}
+        productImages={productImages}
+        disable={disable}
+        handleImageDelete={handleImageDelete}
+      />
     </>
   );
 };
