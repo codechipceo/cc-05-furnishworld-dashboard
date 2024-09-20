@@ -11,6 +11,7 @@ const productPayload = {
   categoryId: [""],
   defaultCategoryId: "",
   salePrice: "",
+  isDeal: false,
 };
 
 export const payloads = {

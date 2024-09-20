@@ -65,6 +65,11 @@ const productForm2 = [
     mimeType: "image/*",
     multiple: true,
   },
+  {
+    name: "isDeal",
+    label: "Make Deal of the Month",
+    type: "switch",
+  },
 ];
 
 export const formsJSON = {

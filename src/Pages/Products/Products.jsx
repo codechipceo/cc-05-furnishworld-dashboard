@@ -94,9 +94,12 @@ export const Products = () => {
       }
       console.log(files);
       setProductImages(files);
+    } else if (name === "isDeal") {
+      data.isDeal = e.target.checked;
     } else {
       data[name] = value;
     }
+    console.log(data);
     setPageData(data);
   };
 
@@ -296,6 +299,12 @@ export const Products = () => {
               handleSubmit={handleSubmit}
               onCancel={handleCancel}
             />
+            <Box mt={3}>
+              <Typography>Select Categories</Typography>
+              <Box display={"flex"} gap={2} flexWrap={"wrap"}>
+                {categoryIds}
+              </Box>
+            </Box>
 
             <FormComponent
               formDefinition={productForm2}
@@ -320,10 +329,6 @@ export const Products = () => {
                       />
                     );
                   })}
-              </Box>
-              <Typography>Select Categories</Typography>
-              <Box display={"flex"} gap={2} flexWrap={"wrap"}>
-                {categoryIds}
               </Box>
 
               <Box
