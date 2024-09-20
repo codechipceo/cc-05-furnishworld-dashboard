@@ -6,7 +6,9 @@ import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Button from "@mui/material/Button";
+import Switch from "@mui/material/Switch";
 import { styled } from "@mui/material/styles";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 export const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -32,9 +34,22 @@ const DynamicForm = ({
   const renderFormFields = (formDefinition) => {
     return formDefinition.map((field, i) => {
       switch (field.type) {
+        case "switch":
+          return (
+            <Box mx={0}>
+              <FormControlLabel
+                value={formData[field.name]}
+                name={field.name}
+                control={<Switch key={field.name} mx={0} />}
+                onChange={handleChange}
+                label={field.label}
+                labelPlacement="start"
+              />
+            </Box>
+          );
         case "select":
           return (
-            <Box key={field.name}>
+            <Box>
               <FormControl margin="dense" fullWidth>
                 <InputLabel color="secondary" id={field.label} size="small">
                   {field.label}
