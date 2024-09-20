@@ -41,7 +41,7 @@ const ImageViewer = ({
           handleSubmit={handleSubmit}
           onCancel={handleClose}
         />
-        {productImages && productImages.length > 0 ? (
+        {/* {productImages && productImages.length > 0 ? (
           <ImageList
             sx={{
               width: { md: 600, sx: 400, xs: 300 },
@@ -53,8 +53,9 @@ const ImageViewer = ({
             cols={3}
             rowHeight={164}
           >
-            {productImages &&
+            {productImages && true  &&
               productImages.map((selectedImage, i) => {
+                console.log(selectedImage);
                 return (
                   <ImageListItem key={i}>
                     <img
@@ -104,7 +105,7 @@ const ImageViewer = ({
                 );
               })}
           </ImageList>
-        ) : null}
+        ) : null} */}
       </Box>
 
       <Box mt={3} sx={{ display: "flex", justifyContent: "space-between" }}>
