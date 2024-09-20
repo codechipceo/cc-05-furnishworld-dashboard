@@ -42,6 +42,17 @@ const productForm2 = [
     defaultValue: 0,
   },
   {
+    name: "saleStatus",
+    label: "Sale Status",
+    type: "select",
+    options: [
+      { _id: "newArrived", saleStatus: "New Arrivals" },
+      { _id: "bestSellers", saleStatus: "Best Sellers" },
+      { _id: "saleItems", saleStatus: "Sale Items" },
+    ],
+    displayKey: "saleStatus",
+  },
+  {
     name: "productDescription",
     label: "Product Description",
     type: "text",
