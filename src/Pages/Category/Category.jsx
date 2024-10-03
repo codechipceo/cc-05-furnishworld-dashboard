@@ -3,7 +3,6 @@
 import { useTools } from "../../Hooks/useTools";
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import FormComponent from "../../Components/FormComponent/FormComponent";
 import { payloads, formsJSON } from "../../constants/index";
 import {
   createCategory,
@@ -16,6 +15,7 @@ import { selectCategory } from "../../Store/categorySlice";
 import { hasData } from "../../util/util";
 import DataTable from "../../Components/DataTable/DataTable";
 import { tableColumns } from "../../constants/tableColumns";
+import { FormComponent } from "../../Components/FormComponent/FormComponent";
 
 const { categoryForm } = formsJSON;
 const { categoryPayload } = payloads;
