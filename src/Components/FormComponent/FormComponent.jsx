@@ -1,13 +1,14 @@
-import DynamicForm from "./DynamicForm";
 import { Button } from "@mui/material";
+import DynamicForm from "./DynamicForm";
 
-const FormComponent = ({
+export const FormComponent = ({
+  status,
   formPayload,
   formDefinition,
   onCancel,
   handleChange,
-  children,
-  ...props
+  handleSubmit,
+  notShowButton,
 }) => {
   return (
     <div>
@@ -15,11 +16,15 @@ const FormComponent = ({
         formData={formPayload}
         formDefinition={formDefinition}
         handleChange={handleChange}
-        {...props}
       />
-      {children}
+      {notShowButton ? null : (
+        <div>
+          <Button onClick={handleSubmit}>
+            {status === "CREATE" ? "Create" : "Update"}
+          </Button>
+          <Button onClick={() => onCancel()}>Cancel</Button>
+        </div>
+      )}
     </div>
   );
 };
-
-export default FormComponent;

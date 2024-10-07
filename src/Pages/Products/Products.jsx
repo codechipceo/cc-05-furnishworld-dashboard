@@ -1,7 +1,7 @@
 import { useTools } from "../../Hooks/useTools";
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import FormComponent from "../../Components/FormComponent/FormComponent";
+import { FormComponent } from "../../Components/FormComponent/FormComponent";
 import { payloads, formsJSON, tableColumns } from "../../constants/index";
 
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
@@ -298,6 +298,7 @@ export const Products = () => {
               handleChange={handleChange}
               handleSubmit={handleSubmit}
               onCancel={handleCancel}
+              notShowButton={true}
             />
             <Box mt={3}>
               <Typography>Select Categories</Typography>
@@ -315,6 +316,7 @@ export const Products = () => {
               handleChange={handleChange}
               handleSubmit={handleSubmit}
               onCancel={handleCancel}
+              notShowButton={false}
             >
               <Box display={"flex"} gap={1} flexWrap={"wrap"}>
                 {productImages &&

@@ -7,7 +7,7 @@ import { ImageListItem } from "@mui/material";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { VisuallyHiddenInput } from "@/Components/FormComponent/DynamicForm";
-import FormComponent from "@/Components/FormComponent/FormComponent";
+import { FormComponent } from "@/Components/FormComponent/FormComponent";
 
 const ImageViewer = ({
   openModal,
