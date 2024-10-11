@@ -17,7 +17,6 @@ const productColumns = [
     }
   }, // This is an array; you might want to handle this differently in your table.
   { field: "salePrice", headerName: "Sale Price", flex: 1 },
-  { field: "isActive", headerName: "Active", flex: 1 },
 ];
 
 export const tableColumns = { categoryColumns, productColumns };

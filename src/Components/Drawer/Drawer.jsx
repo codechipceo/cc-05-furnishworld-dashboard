@@ -71,9 +71,10 @@ export const SideDrawer = () => {
       >
         <Typography
           variant='h4'
+          fontWeight={"bold"}
           sx={{ marginLeft: "auto", marginRight: "auto", paddingTop: 2 }}
         >
-          Brand Name
+          Furnishworld
         </Typography>
         <Sidebar />
       </Drawer>

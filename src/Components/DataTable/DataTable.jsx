@@ -47,31 +47,31 @@ const DataTable = ({
       </div>
     ),
   };
-  const activeColumn = {
-    field: "active",
-    headerName: "Status",
-    width: 150,
-    sortable: false,
-    renderCell: (params) => (
-      <div>
-        <Button variant="outlined" onClick={() => handleActive(params.row)}>
-          {params.row.isActive === false ? "Activate" : "Deactivate"}
-        </Button>
-      </div>
-    ),
-  };
+  // const activeColumn = {
+  //   field: "active",
+  //   headerName: "Status",
+  //   width: 150,
+  //   sortable: false,
+  //   renderCell: (params) => (
+  //     <div>
+  //       <Button variant="outlined" onClick={() => handleActive(params.row)}>
+  //         {params.row.isActive === false ? "Activate" : "Deactivate"}
+  //       </Button>
+  //     </div>
+  //   ),
+  // };
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full">
       <div className="w-full relative">
         <DataGrid
           rows={rows}
-          columns={[...columns, activeColumn, actionColumn]}
+          columns={[...columns,  actionColumn]}
           getRowId={(row) => row._id}
           className=""
           pagination
           rowCount={totalCount}
-          pageSizeOptions={[10, 50, 100]}
+          pageSizeOptions={[10]}
           paginationMode={"server"}
           onPaginationModelChange={setPaginationModel}
           paginationModel={paginationModel}

@@ -1,25 +1,27 @@
-import { useTools } from "../../Hooks/useTools";
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { FormComponent } from "../../Components/FormComponent/FormComponent";
-import { payloads, formsJSON, tableColumns } from "../../constants/index";
+import { formsJSON, payloads, tableColumns } from "../../constants/index";
+import { useTools } from "../../Hooks/useTools";
 
+import DataTable from "../../Components/DataTable/DataTable";
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
 import { hasData } from "../../util/util";
-import DataTable from "../../Components/DataTable/DataTable";
 
+import Checkbox from "@mui/material/Checkbox";
+import { useNavigate } from "react-router-dom";
+import { Loader } from "../../Components/Loader/Loader";
+import { selectCategory } from "../../Store/categorySlice";
+import { selectProducts } from "../../Store/productSlice";
 import {
   createProduct,
   deleteProduct,
+  deleteProductImage,
   getAllCategories,
   getAllProducts,
   updateProduct,
   updateProductImage,
-  deleteProductImage,
 } from "../../thunk";
-import { selectCategory } from "../../Store/categorySlice";
-import Checkbox from "@mui/material/Checkbox";
-import { selectProducts } from "../../Store/productSlice";
 import ImageViewer from "./ImageUpload/ImageViewer";
 
 const { productForm1, productForm2 } = formsJSON;
@@ -31,14 +33,11 @@ export const Products = () => {
           STATES
   ########################################################################
  */
-  const options = {
-    apiKey: "free", // Get API key: https://www.bytescale.com/get-started
-    maxFileCount: 1,
-  };
+
   const { dispatch, useSelector } = useTools();
   const [paginationMode, setPaginationModel] = useState({
     page: 0,
-    pageSize: 20,
+    pageSize: 10,
   });
   const [isForm, setForm] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -49,11 +48,16 @@ export const Products = () => {
 
   const [productImages, setProductImages] = useState([]);
   const [disable, setDisable] = useState(true);
+  const navigate = useNavigate();
 
   //redux data
   const { data: categoryData, isError } = useSelector(selectCategory);
-  const { data: productData, isError: productError } =
-    useSelector(selectProducts);
+  const {
+    data: productData,
+    count: productCount,
+    isError: productError,
+    isLoading: productLoading,
+  } = useSelector(selectProducts);
 
   /*
   ########################################################################
@@ -92,14 +96,14 @@ export const Products = () => {
         const updatedImg = productImages.filter((img) => imag !== img);
         files.push(...updatedImg);
       }
-      console.log(files);
+
       setProductImages(files);
     } else if (name === "isDeal") {
       data.isDeal = e.target.checked;
     } else {
       data[name] = value;
     }
-    console.log(data);
+
     setPageData(data);
   };
 
@@ -203,17 +207,19 @@ export const Products = () => {
     }
   };
 
-  const handleImageUpload = (row) => {
-    const data = { ...row };
-    data.productId = row._id;
-    setPageData(data);
+  const handleImageUpload = ({ _id }) => {
+    navigate(`/products/${_id}`);
+    // const data = { ...row };
+    // data.productId = row._id;
+    // setPageData(data);
 
-    setProductImages(data.productImages);
-    setOpenModal(true);
-    setStatus("UPLOAD_IMAGE");
+    // setProductImages(data.productImages);
+    // setOpenModal(true);
+    // setStatus("UPLOAD_IMAGE");
   };
 
   const handleImageDelete = async (productId, img) => {
+    
     await dispatch(deleteProductImage({ productId, imageId: img._id }));
     const proImag = productImages.filter((item) => item !== img);
 
@@ -229,8 +235,13 @@ export const Products = () => {
 
   useEffect(() => {
     dispatch(getAllCategories());
-    dispatch(getAllProducts());
-  }, []);
+    dispatch(
+      getAllProducts({
+        limit: paginationMode.pageSize,
+        skip: paginationMode.page * paginationMode.pageSize,
+      })
+    );
+  }, [paginationMode]);
 
   /*
   ########################################################################
@@ -254,12 +265,14 @@ export const Products = () => {
 
   return (
     <>
+      {productLoading && <Loader />}
+
       <HeaderBar title={"Products"} />
       {isForm === false ? (
         <>
           <Wrapper>
             <Box mb={4}>
-              <Button variant="contained" onClick={() => setForm(true)}>
+              <Button variant='contained' onClick={() => setForm(true)}>
                 Add New Product +
               </Button>
             </Box>
@@ -272,9 +285,10 @@ export const Products = () => {
                 handleImageUpload={handleImageUpload}
                 handleChange={handleChange}
                 columns={productColumns}
-                totalCount={0}
+                totalCount={productCount}
                 paginationModel={paginationMode}
                 setPaginationModel={setPaginationModel}
+                paginationMode='server'
               />
             ) : (
               <Box>
@@ -310,7 +324,7 @@ export const Products = () => {
             <FormComponent
               formDefinition={productForm2}
               grid={true}
-              gridTemplateColumns="2fr"
+              gridTemplateColumns='2fr'
               formPayload={pageData}
               status={status}
               handleChange={handleChange}
@@ -326,7 +340,7 @@ export const Products = () => {
                         src={selectedImage}
                         height={"80px"}
                         width={"80px"}
-                        alt=""
+                        alt=''
                         key={i}
                       />
                     );
@@ -339,12 +353,12 @@ export const Products = () => {
               >
                 <Button
                   onClick={handleSubmit}
-                  variant="outlined"
-                  color="success"
+                  variant='outlined'
+                  color='success'
                 >
                   {status === "CREATE" ? "Create" : "Update"}
                 </Button>
-                <Button variant="outlined" color="error" onClick={handleCancel}>
+                <Button variant='outlined' color='error' onClick={handleCancel}>
                   Cancel
                 </Button>
               </Box>

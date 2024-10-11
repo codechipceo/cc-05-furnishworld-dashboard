@@ -9,6 +9,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { routes } from "./routes";
 import PropTypes from "prop-types";
+import { Button } from "@mui/material";
+import { useTools } from "../../Hooks/useTools";
+import { logout } from "../../Store/adminSlice";
 
 const CreateIcon = ({ MyIcon }) => {
   return (
@@ -20,6 +23,7 @@ const CreateIcon = ({ MyIcon }) => {
 };
 
 export const Sidebar = () => {
+  const { dispatch } = useTools();
   const [open, setOpen] = useState(-1);
   const navigate = useNavigate();
   const handleOpen = (value) => {
@@ -53,6 +57,7 @@ export const Sidebar = () => {
                 subMenu && <ExpandMore />
               )}
             </ListItemButton>
+
             {subMenu &&
               subMenu.map((subRoutes, index) => {
                 const { path, name, icon } = subRoutes;
@@ -83,7 +88,13 @@ export const Sidebar = () => {
           </List>
         );
       })}
-      <List></List>
+      <Button
+        variant='contained'
+        sx={{ margin: "0px 5px" }}
+        onClick={() => dispatch(logout())}
+      >
+        Logout
+      </Button>
     </>
   );
 };

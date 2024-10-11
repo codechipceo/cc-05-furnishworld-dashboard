@@ -19,13 +19,14 @@ export const CustomModal = ({ open, handleClose, children }) => {
     <Modal
       open={open}
       onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
+      aria-labelledby='modal-modal-title'
+      aria-describedby='modal-modal-description'
     >
       <Box sx={style}>
-        <IconButton onClick={handleClose}>
-          <CloseIcon sx={{ color: "gray" }} />
-        </IconButton>
+        <Box>
+   
+        </Box>
+
         {children}
       </Box>
     </Modal>

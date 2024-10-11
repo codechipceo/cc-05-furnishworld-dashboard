@@ -9,6 +9,7 @@ import {
   deleteCategory,
   getAllCategories,
   updateCategory,
+  updateCategoryImageFn,
 } from "../../thunk";
 import { HeaderBar, Wrapper } from "../../Components/Wrapperr";
 import { selectCategory } from "../../Store/categorySlice";
@@ -16,6 +17,9 @@ import { hasData } from "../../util/util";
 import DataTable from "../../Components/DataTable/DataTable";
 import { tableColumns } from "../../constants/tableColumns";
 import { FormComponent } from "../../Components/FormComponent/FormComponent";
+import { CustomModal } from "../../Components/CustomModal";
+import ImageCard from "../../Components/ImageCard/ImageCard";
+import { Loader } from "../../Components/Loader/Loader";
 
 const { categoryForm } = formsJSON;
 const { categoryPayload } = payloads;
@@ -28,6 +32,8 @@ export const Category = () => {
  */
 
   const { dispatch, useSelector } = useTools();
+  const [modal, setModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [paginationMode, setPaginationModel] = useState({
     page: 0,
     pageSize: 20,
@@ -36,7 +42,12 @@ export const Category = () => {
   const [status, setStatus] = useState("CREATE");
   const [pageData, setPageData] = useState({ ...categoryPayload });
 
-  const { data: categoryData, isError } = useSelector(selectCategory);
+  const {
+    data: categoryData,
+    isError,
+    isLoading: categoryLoading,
+    totalCount,
+  } = useSelector(selectCategory);
 
   /*
   ########################################################################
@@ -54,6 +65,11 @@ export const Category = () => {
       data[name] = value;
     }
     setPageData(data);
+  };
+
+  const handleImageUpload = (categoryId) => {
+    setModal(true);
+    setSelectedCategory(categoryId);
   };
 
   const handleActive = (category) => {
@@ -75,7 +91,7 @@ export const Category = () => {
 
   const handleSubmit = async () => {
     const formData = new FormData();
-    console.log(status);
+
     if (status === "CREATE") {
       formData.append("categoryTitle", pageData.categoryTitle);
       formData.append("categoryImage", pageData.categoryImage);
@@ -112,6 +128,19 @@ export const Category = () => {
     dispatch(deleteCategory(payload));
   };
 
+  const handleUpdateCategoryImage = (id, file) => {
+    const formData = new FormData();
+    formData.append("categoryId", id);
+    formData.append("image", file);
+
+    dispatch(updateCategoryImageFn(formData)).then((res) => {
+
+
+      setSelectedCategory(res.payload.data);
+    });
+  };
+
+
   /*
   ########################################################################
           USE EFFECT
@@ -124,12 +153,23 @@ export const Category = () => {
 
   return (
     <>
+      {categoryLoading && <Loader />}
+      <CustomModal open={modal} handleClose={() => setModal(false)}>
+        <Typography variant='h6' fontWeight={"bold"}>
+          Category Image
+        </Typography>
+        <ImageCard
+          imageId={selectedCategory?._id}
+          imageUrl={selectedCategory?.categoryImage}
+          onUpdate={handleUpdateCategoryImage}
+        />
+      </CustomModal>
       <HeaderBar title={"Product Category"} />
       {isForm === false ? (
         <>
           <Wrapper>
             <Box mb={4}>
-              <Button variant="contained" onClick={() => setForm(true)}>
+              <Button variant='contained' onClick={() => setForm(true)}>
                 Add New Category +
               </Button>
             </Box>
@@ -139,8 +179,9 @@ export const Category = () => {
                 handleActive={handleActive}
                 handleEdit={handleEdit}
                 handleDelete={handleDelete}
+                handleImageUpload={handleImageUpload}
                 columns={categoryColumns}
-                totalCount={0}
+                totalCount={totalCount}
                 paginationModel={paginationMode}
                 setPaginationModel={setPaginationModel}
               />

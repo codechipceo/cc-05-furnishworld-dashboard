@@ -4,6 +4,7 @@ const category = {
   getbyid: "category/getbyid",
   update: "category/update",
   delete: "category/delete",
+  updateImage: "category/updateImage",
 };
 
 const products = {
@@ -12,11 +13,18 @@ const products = {
   getAll: "product/getAll",
   getById: "product/getById",
   update: "product/update",
-  delete: "product/delete",
+  delete: "product/deleteProductImage",
   upload: "product/",
+  updateImage: "product/updateImage",
+};
+
+const admin = {
+  login: "admin/login",
+  create: "admin/create",
 };
 
 export const apiEndpoints = {
   category,
   products,
+  admin,
 };

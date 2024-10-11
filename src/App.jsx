@@ -3,6 +3,10 @@ import { useResponsive } from "./Hooks/use-responsive";
 import { SideDrawer } from "./Components/Drawer/Drawer";
 import { Category, Products } from "./Pages/indexPages";
 import PropTypes from "prop-types";
+import { ProductDetail } from "./Pages/Products/ProductDetail";
+import { useSelector } from "react-redux";
+import { adminState } from "./Store/adminSlice";
+import { Login } from "./Pages/Admin/Login";
 
 const drawerWidth = 210;
 
@@ -15,13 +19,22 @@ const routes = [
     element: <Products />,
     path: "/products",
   },
+  {
+    element: <ProductDetail />,
+    path: "/products/:productId",
+  },
 ];
 
 function App() {
   const deviceType = useResponsive();
+  const adminToken  = useSelector(adminState)
 
   return (
     <>
+      {
+        adminToken ? <Login /> :
+          <>
+
       <BrowserRouter>
         <div style={{ display: "flex" , flex:1}}>
           <SideDrawer />
@@ -32,6 +45,8 @@ function App() {
           </div>
         </div>
       </BrowserRouter>
+            </>
+      }
     </>
   );
 }
