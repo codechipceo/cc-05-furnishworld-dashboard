@@ -27,26 +27,30 @@ const routes = [
 
 function App() {
   const deviceType = useResponsive();
-  const adminToken  = useSelector(adminState)
+  const {token} = useSelector(adminState);
 
   return (
     <>
-      {
-        adminToken ? <Login /> :
-          <>
-
-      <BrowserRouter>
-        <div style={{ display: "flex" , flex:1}}>
-          <SideDrawer />
-          <div
-            style={{ marginLeft: deviceType === "MOBILE" ? 0 : drawerWidth, flex:1, overflow:"hidden" }}
-          >
-            <AppRouter routes={routes} />
-          </div>
-        </div>
-      </BrowserRouter>
-            </>
-      }
+      {!token ? (
+        <Login />
+      ) : (
+        <>
+          <BrowserRouter>
+            <div style={{ display: "flex", flex: 1 }}>
+              <SideDrawer />
+              <div
+                style={{
+                  marginLeft: deviceType === "MOBILE" ? 0 : drawerWidth,
+                  flex: 1,
+                  overflow: "hidden",
+                }}
+              >
+                <AppRouter routes={routes} />
+              </div>
+            </div>
+          </BrowserRouter>
+        </>
+      )}
     </>
   );
 }

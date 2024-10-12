@@ -19,7 +19,7 @@ const products = {
 };
 
 const admin = {
-  login: "admin/login",
+  login: "user/signIn",
   create: "admin/create",
 };
 

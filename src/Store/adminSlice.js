@@ -24,8 +24,8 @@ const adminSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.data;
-        localStorage.setItem("adminToken", action.payload.data);
+        state.token = action.payload.data?.token;
+        localStorage.setItem("adminToken", action.payload.data?.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;

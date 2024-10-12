@@ -3,12 +3,13 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "../../thunk";
+import bgImage from "../../assets/bgImage.jpg";
 export const Login = () => {
   const [loginState, setLoginState] = useState({
-    username: "",
+    email: "",
     password: "",
   });
-const dispatch  = useDispatch()
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +26,7 @@ const dispatch  = useDispatch()
     <div style={{ zIndex: 5, position: "absolute", width: "100vw" }}>
       <div
         style={{
-          background: `url(${"bgImage"})`,
+          background: `url(${bgImage})`,
           minHeight: "100vh",
 
           backgroundSize: "cover",
@@ -54,16 +55,16 @@ const dispatch  = useDispatch()
               fontWeight={"bold"}
               color={"#c35df7"}
             >
-              Studydiploma
+              Furnishworld Dashboard
             </Typography>
 
             <Box>
-              <Typography>Username</Typography>
+              <Typography>Email</Typography>
               <TextField
                 onChange={handleChange}
                 fullWidth
                 variant='standard'
-                name='username'
+                name='email'
                 type='text'
               />
             </Box>
@@ -83,7 +84,7 @@ const dispatch  = useDispatch()
                 variant='contained'
                 disableElevation
                 fullWidth
-                onClick={ (e) =>handleSubmit(e)}
+                onClick={(e) => handleSubmit(e)}
               >
                 Login
               </Button>
